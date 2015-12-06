@@ -1,0 +1,5 @@
+*.exe
+backup
+lib
+old_modules
+docs
