@@ -1,3 +1,5 @@
+// comment
+// comment 2
 unit Lists;
 {$mode objfpc}{$H+}
 interface
