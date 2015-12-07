@@ -18,6 +18,7 @@ type
       Procedure SetYCoord(i:integer);
       Function GetYCoord:integer;
       Procedure AddSWay;
+      Function NumSWays:integer; // Testing
       Function CheckSWays:boolean;
     Public
       Constructor Create;
@@ -57,7 +58,12 @@ end;
 
 Procedure TStation.AddSWay;
 begin
-  if CheckSWays then SWayNum:=SWayNum+1;
+  SWayNum:=SWayNum+1;
+end;
+
+Function TStation.NumSWays:integer;  // FOR TEST. TESTING
+begin
+  NumSWays:=SWayNum;
 end;
 
 Function TStation.CheckSWays:boolean;
