@@ -19,10 +19,16 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
+<<<<<<< HEAD
         <IsVisibleTab Value="True"/>
         <WindowIndex Value="1"/>
         <TopLine Value="165"/>
         <CursorPos X="85" Y="171"/>
+=======
+        <WindowIndex Value="1"/>
+        <TopLine Value="188"/>
+        <CursorPos X="38" Y="145"/>
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
         <UsageCount Value="200"/>
         <Bookmarks Count="1">
           <Item0 X="4" Y="236" ID="3"/>
@@ -37,7 +43,11 @@
         <EditorIndex Value="1"/>
         <WindowIndex Value="1"/>
         <CursorPos X="9" Y="9"/>
+<<<<<<< HEAD
         <UsageCount Value="61"/>
+=======
+        <UsageCount Value="60"/>
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
         <Loaded Value="True"/>
       </Unit2>
       <Unit3>
@@ -48,7 +58,11 @@
         <WindowIndex Value="1"/>
         <TopLine Value="35"/>
         <CursorPos Y="62"/>
+<<<<<<< HEAD
         <UsageCount Value="61"/>
+=======
+        <UsageCount Value="60"/>
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
         <Bookmarks Count="1">
           <Item0 Y="6" ID="4"/>
         </Bookmarks>
@@ -62,7 +76,11 @@
         <WindowIndex Value="1"/>
         <TopLine Value="37"/>
         <CursorPos Y="60"/>
+<<<<<<< HEAD
         <UsageCount Value="60"/>
+=======
+        <UsageCount Value="59"/>
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
         <Loaded Value="True"/>
       </Unit4>
       <Unit5>
@@ -72,7 +90,11 @@
         <EditorIndex Value="4"/>
         <WindowIndex Value="1"/>
         <CursorPos X="26" Y="19"/>
+<<<<<<< HEAD
         <UsageCount Value="58"/>
+=======
+        <UsageCount Value="57"/>
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
         <Loaded Value="True"/>
       </Unit5>
       <Unit6>
@@ -82,7 +104,11 @@
         <EditorIndex Value="5"/>
         <WindowIndex Value="1"/>
         <CursorPos X="18" Y="13"/>
+<<<<<<< HEAD
         <UsageCount Value="52"/>
+=======
+        <UsageCount Value="51"/>
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
         <Loaded Value="True"/>
       </Unit6>
       <Unit7>

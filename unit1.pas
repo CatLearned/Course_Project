@@ -199,7 +199,11 @@ begin
   Begin
     if not (NameOfStationFirstCrossingField.Text=NameOfStationSecondCrossingField.Text) then
     begin
+<<<<<<< HEAD
       if not CheckStationName(NameOfStationFirstCrossingField.Text) and not CheckStationName(NameOfStationSecondCrossingField.Text) then
+=======
+      if not CheckStationName(NameOfStationFirstCrossingField.Text) or not CheckStationName(NameOfStationSecondCrossingField.Text) then
+>>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
       begin
         _way.SetFStation(GetStation(NameOfStationFirstCrossingField.Text)^.Value);
         _way.SetSStation(GetStation(NameOfStationSecondCrossingField.Text)^.Value);
