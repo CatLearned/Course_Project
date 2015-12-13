@@ -10,6 +10,8 @@ type
       SWayNum:integer;
       x:integer;
       y:integer;
+      isvisited:boolean;
+      Coefficient:integer;
     Public
       Procedure SetName(s:string);
       Function GetName:string;
@@ -19,7 +21,11 @@ type
       Function GetYCoord:integer;
       Procedure AddSWay;
       Function NumSWays:integer; // Testing
+      Procedure SetVisited(b:boolean);
+      Function GetVisited:boolean;
       Function CheckSWays:boolean;
+      Procedure SetCoefficient(i:integer);
+      Function GetCoefficient:integer;
     Public
       Constructor Create;
       Destructor Done;
@@ -72,13 +78,35 @@ begin
   if SWayNum>=2 then CheckSWays:=false;
 end;
 
+Procedure TStation.SetVisited(b:boolean);
+begin
+  isVisited:=b;
+end;
+
+Function TStation.GetVisited:boolean;
+begin
+  GetVisited:=isVisited;
+end;
+
+Procedure TStation.SetCoefficient(i:integer);
+begin
+  Coefficient:=i;
+end;
+
+Function TStation.GetCoefficient:integer;
+begin
+  GetCoefficient:=Coefficient;
+end;
+
 Constructor TStation.Create;
 begin
   Name:='';
   SWayNum:=0;
   x:=0;
   y:=0;
+  Coefficient:=32767;
 end;
+
 
 Destructor TStation.Done;
 begin end;

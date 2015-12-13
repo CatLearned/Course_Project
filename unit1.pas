@@ -18,7 +18,28 @@ type
     AddStationItem: TMenuItem;
     AddWayItem: TMenuItem;
     AddCrossingItem: TMenuItem;
-    Image1: TImage;
+    AlgorithmRunButton: TButton;
+    DelWayButton: TButton;
+    DelStationButton: TButton;
+    DelStationEdit: TEdit;
+    BackGround: TImage;
+    DelElementItem: TMenuItem;
+    DelStationItem: TMenuItem;
+    DelSubWayItem: TMenuItem;
+    DelStationPanel: TPanel;
+    DelStationLabel: TLabel;
+    DelWayPanel: TPanel;
+    DelFStationWayEdit: TEdit;
+    DelSStationWayEdit: TEdit;
+    DelWayLabel: TLabel;
+    AlgorithmItem: TMenuItem;
+    AlgorithmPanel: TPanel;
+    AlgorithmFStationEdit: TEdit;
+    AlgorithmSStationEdit: TEdit;
+    AlgorithmFStationLabel: TLabel;
+    AlgorithmSStationLabel: TLabel;
+    AlgorithmCaptionOfAlgorithm: TLabel;
+    RunAlgorithmItem: TMenuItem;
     UnderGroundMap: TImage;
     MinWayLabel: TLabel;
     AddCrossingPanel: TPanel;
@@ -50,10 +71,18 @@ type
     procedure AddCrossingItemClick(Sender: TObject);
     procedure AddStationItemClick(Sender: TObject);
     procedure AddWayItemClick(Sender: TObject);
+    procedure AlgorithmRunButtonClick(Sender: TObject);
+    procedure DelStationButtonClick(Sender: TObject);
+    procedure DelStationItemClick(Sender: TObject);
+    procedure DelSubWayItemClick(Sender: TObject);
+    procedure DelWayButtonClick(Sender: TObject);
     procedure Edit1Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     {Station}
     procedure AddStationButtonChange(Sender: TObject);
+    procedure DelElementItemClick(Sender: TObject);
+    procedure BackGroundClick(Sender: TObject);
+    procedure RunAlgorithmItemClick(Sender: TObject);
     procedure UndergroundMapClick(Sender: TObject);
     Procedure AddStationList(v:TStation);
     Function CheckStationName(s:string):boolean;
@@ -62,6 +91,8 @@ type
     {Way}
     procedure AddWayButtonClick(Sender: TObject);
     Procedure AddWayList(v:TWay);
+    function GetWay(s,s1:string):WPItem;
+    function CheckWay(s,s1:string):boolean;
   private
     {Переменные для Station}
     _station:TStation;
@@ -113,6 +144,8 @@ begin
       _station.SetName(NameOfStationField.Text);
       _station.SetXCoord(coord.X);
       _station.SetYCoord(coord.y);
+      _station.SetVisited(false);
+      _station.SetCoefficient(32767);
       AddStationList(_station);
       NameOfStationField.Text:='';
       NameOfStationField.SetFocus;
@@ -128,9 +161,13 @@ begin
   AddWayPanel.Visible:=False;
   AddCrossingPanel.Visible:=False;
   AddStationButton.Checked:=False;
+  DelStationPanel.Visible:=False;
+  DelWayPanel.Visible:=False;
+  AlgorithmPanel.Visible:=False;
 end;
 
 procedure TForm1.AddWayButtonClick(Sender: TObject);
+var Selected:integer;
 begin
   if not (NameOfStationFirstField.Text='') and not (NameOfStationSecondField.Text='') then
   Begin
@@ -139,8 +176,27 @@ begin
       if not CheckStationName(NameOfStationFirstField.Text) and not CheckStationName(NameOfStationSecondField.Text) then
       begin
         if GetStation(NameOfStationFirstField.Text)^.Value.CheckSWays
-           and
-           GetStation(NameOfStationSecondField.Text)^.Value.CheckSWays then
+        and
+        GetStation(NameOfStationSecondField.Text)^.Value.CheckSWays then
+        if CheckWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text) then
+        begin
+          Selected:=MessageDlg('Между этими станциями уже есть связь, перезаписать?', mtConfirmation, [mbYes, mbNo], 0);
+          if Selected = mrYes then
+          begin
+            //GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetFStation(GetStation(NameOfStationFirstField.Text)^.Value);
+            //GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetSStation(GetStation(NameOfStationSecondField.Text)^.Value);
+            GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetTransition(True);
+            GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetTime(TimeWayEdit.Value);
+            GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetVisited(False);
+            Form1.UndergroundMap.Canvas.MoveTo(GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.GetFStation.GetXCoord,_way.GetFStation.GetYCoord);
+            Form1.UndergroundMap.Canvas.LineTo(GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.GetSStation.GetXCoord,_way.GetSStation.GetYCoord);
+            Form1.UndergroundMap.Canvas.TextOut((GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.GetFStation.GetXCoord+_way.GetSStation.GetXCoord) div 2,
+                                                (GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.GetFStation.GetYCoord+_way.GetSStation.GetYCoord) div 2,
+                                                inttostr(GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.GetTime));
+            ShowMessage('Изменение Выполнено');
+          end
+        end
+        else
         begin
           _way.SetFStation(GetStation(NameOfStationFirstField.Text)^.Value);
           GetStation(NameOfStationFirstField.Text)^.Value.AddSWay;
@@ -162,12 +218,12 @@ begin
                     + inttostr(GetStation(NameOfStationFirstField.Text)^.Value.NumSWays)
                     + BoolToStr(GetStation(NameOfStationSecondField.Text)^.Value.CheckSWays, 'True', 'False')
                     + inttostr(GetStation(NameOfStationSecondField.Text)^.Value.NumSWays));
+          end
+        else ShowMessage('У одной из станций исчерпан лимит путей. Попробуйте создать переход.')
         end
-        else ShowMessage('У одной из станций исчерпан лимит путей. Попробуйте создать переход.');
-      end
       else ShowMessage('Станции пути должны существовать');
     end
-    else ShowMessage('Названия станций пути не могут совпадать');
+    else ShowMessage('Названия станций совпадают или не существуют');
   end
   else ShowMessage('Названия станций пути не могут быть пустыми');
 end;
@@ -178,6 +234,60 @@ begin
   AddWayPanel.Visible:=True;
   AddCrossingPanel.Visible:=False;
   AddStationButton.Checked:=False;
+  DelStationPanel.Visible:=False;
+  DelWayPanel.Visible:=False;
+  AlgorithmPanel.Visible:=False;
+end;
+
+procedure TForm1.AlgorithmRunButtonClick(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.DelStationButtonClick(Sender: TObject);
+begin
+  if not (DelStationEdit.Text='') then
+  if CheckStationName(DelStationEdit.Text)=false then
+  if CheckWay(DelStationEdit.Text, '')=false then
+  ShowMessage('Deleting')
+  else ShowMessage('Эта станция является связной, Удалите все связи этой станции')
+  else ShowMessage('Такой Станции не существует, возможно она уже удалена.')
+  else ShowMessage('Нельзя удалить пустую станцию.');
+end;
+
+procedure TForm1.DelStationItemClick(Sender: TObject);
+begin
+  AddStationPanel.Visible:=False;
+  AddWayPanel.Visible:=False;
+  AddCrossingPanel.Visible:=False;
+  AddStationButton.Checked:=False;
+  DelStationPanel.Visible:=True;
+  DelWayPanel.Visible:=False;
+  AlgorithmPanel.Visible:=False;
+end;
+
+procedure TForm1.DelSubWayItemClick(Sender: TObject);
+begin
+  AddStationPanel.Visible:=False;
+  AddWayPanel.Visible:=False;
+  AddCrossingPanel.Visible:=False;
+  AddStationButton.Checked:=False;
+  DelStationPanel.Visible:=False;
+  DelWayPanel.Visible:=True;
+  AlgorithmPanel.Visible:=False;
+end;
+
+procedure TForm1.DelWayButtonClick(Sender: TObject);
+begin
+  if not (DelFStationWayEdit.Text='') and not (DelSStationWayEdit.Text='') then
+  if not (DelFStationWayEdit.Text=DelSStationWayEdit.Text) then
+  if not CheckStationName(DelFStationWayEdit.Text) and not CheckStationName(DelSStationWayEdit.Text) then
+  if CheckWay(DelFStationWayEdit.Text, DelSStationWayEdit.Text) then
+  ShowMessage('Процедура удаления')
+  else ShowMessage('Путь не существует, возможно он был удалён')
+  else ShowMessage('Станции должны существовать')
+  else ShowMessage('Введённые станции одинаковы или не существуют')
+  else ShowMessage('Нельзя удалить путь между несуществующими станциями');
 end;
 
 
@@ -191,37 +301,60 @@ begin
   AddWayPanel.Visible:=False;
   AddCrossingPanel.Visible:=True;
   AddStationButton.Checked:=False;
+  DelStationPanel.Visible:=False;
+  DelWayPanel.Visible:=False;
+  AlgorithmPanel.Visible:=False;
 end;
 
 procedure TForm1.AddCrossingButtonClick(Sender: TObject);
+var Selected:integer;
 begin
   if not (NameOfStationFirstCrossingField.Text='') and not (NameOfStationSecondCrossingField.Text='') then
   Begin
     if not (NameOfStationFirstCrossingField.Text=NameOfStationSecondCrossingField.Text) then
     begin
-<<<<<<< HEAD
       if not CheckStationName(NameOfStationFirstCrossingField.Text) and not CheckStationName(NameOfStationSecondCrossingField.Text) then
-=======
-      if not CheckStationName(NameOfStationFirstCrossingField.Text) or not CheckStationName(NameOfStationSecondCrossingField.Text) then
->>>>>>> d4252adc4765b446f38f8bed9245be2c1dd88363
       begin
-        _way.SetFStation(GetStation(NameOfStationFirstCrossingField.Text)^.Value);
-        _way.SetSStation(GetStation(NameOfStationSecondCrossingField.Text)^.Value);
-        _way.SetTime(TimeCrossingEdit.Value);
-        _way.SetTransition(False);
-        _way.SetVisited(False);
-        AddWayList(_way);
-        //RISOVANIE
-        Form1.UndergroundMap.Canvas.Pen.Style:= psDot;
-        Form1.UndergroundMap.Canvas.MoveTo(_way.GetFStation.GetXCoord,_way.GetFStation.GetYCoord);
-        Form1.UndergroundMap.Canvas.LineTo(_way.GetSStation.GetXCoord,_way.GetSStation.GetYCoord);
-        Form1.UndergroundMap.Canvas.TextOut((_way.GetFStation.GetXCoord+_way.GetSStation.GetXCoord) div 2,(_way.GetFStation.GetYCoord+_way.GetSStation.GetYCoord) div 2,inttostr(_way.GetTime));
-        Form1.UndergroundMap.Canvas.Pen.Style:= psSolid;
-        //DOBAVIT'
+        if CheckWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text) then
+        begin
+          Selected:=MessageDlg('Между этими станциями уже есть связь, перезаписать?', mtConfirmation, [mbYes, mbNo], 0);
+          if Selected = mrYes then
+          begin
+            //GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetFStation(GetStation(NameOfStationFirstField.Text)^.Value);
+            //GetWay(NameOfStationFirstField.Text, NameOfStationSecondField.Text)^.Value.SetSStation(GetStation(NameOfStationSecondField.Text)^.Value);
+            GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.SetTransition(False);
+            GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.SetTime(TimeCrossingEdit.Value);
+            GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.SetVisited(False);
+            Form1.UndergroundMap.Canvas.Pen.Style:= psDot;
+            Form1.UndergroundMap.Canvas.MoveTo(GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.GetFStation.GetXCoord,_way.GetFStation.GetYCoord);
+            Form1.UndergroundMap.Canvas.LineTo(GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.GetSStation.GetXCoord,_way.GetSStation.GetYCoord);
+            Form1.UndergroundMap.Canvas.TextOut((GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.GetFStation.GetXCoord+_way.GetSStation.GetXCoord) div 2,
+                                                (GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.GetFStation.GetYCoord+_way.GetSStation.GetYCoord) div 2,
+                                                inttostr(GetWay(NameOfStationFirstCrossingField.Text, NameOfStationSecondCrossingField.Text)^.Value.GetTime));
+            Form1.UndergroundMap.Canvas.Pen.Style:= psSolid;
+            ShowMessage('Изменение Выполнено');
+          end;
+        end
+        else
+        begin
+          _way.SetFStation(GetStation(NameOfStationFirstCrossingField.Text)^.Value);
+          _way.SetSStation(GetStation(NameOfStationSecondCrossingField.Text)^.Value);
+          _way.SetTime(TimeCrossingEdit.Value);
+          _way.SetTransition(False);
+          _way.SetVisited(False);
+          AddWayList(_way);
+          //RISOVANIE
+          Form1.UndergroundMap.Canvas.Pen.Style:= psDot;
+          Form1.UndergroundMap.Canvas.MoveTo(_way.GetFStation.GetXCoord,_way.GetFStation.GetYCoord);
+          Form1.UndergroundMap.Canvas.LineTo(_way.GetSStation.GetXCoord,_way.GetSStation.GetYCoord);
+          Form1.UndergroundMap.Canvas.TextOut((_way.GetFStation.GetXCoord+_way.GetSStation.GetXCoord) div 2,(_way.GetFStation.GetYCoord+_way.GetSStation.GetYCoord) div 2,inttostr(_way.GetTime));
+          Form1.UndergroundMap.Canvas.Pen.Style:= psSolid;
+          //DOBAVIT'
+        end;
       end
       else ShowMessage('Станции перехода должны существовать');
     end
-    else ShowMessage('Названия станций перехода не могут совпадать');
+    else ShowMessage('Названия станций совпадают или не существуют');
   end
   else ShowMessage('Названия станций перехода не могут быть пустыми');
 end;
@@ -236,6 +369,28 @@ begin
     AddStationButton.Checked:=not(AddStationButton.Checked);
   end;
 end;
+
+procedure TForm1.DelElementItemClick(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.BackGroundClick(Sender: TObject);
+begin
+
+end;
+
+procedure TForm1.RunAlgorithmItemClick(Sender: TObject);
+begin
+  AddStationPanel.Visible:=False;
+  AddWayPanel.Visible:=False;
+  AddCrossingPanel.Visible:=False;
+  AddStationButton.Checked:=False;
+  DelStationPanel.Visible:=False;
+  DelWayPanel.Visible:=False;
+  AlgorithmPanel.Visible:=True;
+end;
+
 // New procedures
 Procedure TForm1.AddStationList(v:TStation);
 begin
@@ -287,18 +442,44 @@ begin
   head:=standart;
 end;
 
-//Function TForm1.GetItemStation(s:string):PItem;
-//  var standart:PItem;
-//begin
-//  standart:=head;
-//  while Head<>nil do
-//  begin
-//    p:=Head;
-//    if p^.Value.GetName=s then GetItemStation:=p;
-//    Head:=Head^.next;
-//  end;
-//  head:=standart;
-//end;
+function TForm1.GetWay(s,s1:string):WPItem;
+  var standart:WPItem;
+begin
+  standart:=WayHead;
+  while WayHead<>nil do
+  begin
+    WP:=WayHead;
+    if ((Wp^.Value.GetFStation.GetName=s) and (Wp^.Value.GetSStation.GetName=s1)) or ((Wp^.Value.GetFStation.GetName=s1) and (Wp^.Value.GetSStation.GetName=s)) then GetWay:=wp;
+    WayHead:=WayHead^.next;
+  end;
+   WayHead:=standart;
+end;
+
+function TForm1.CheckWay(s,s1:string):boolean;
+var standart:WPItem;
+begin
+  standart:=WayHead;
+  CheckWay:=false;
+  if s1='' then
+  begin
+    while WayHead<>nil do
+    begin
+      WP:=WayHead;
+      if ((Wp^.Value.GetFStation.GetName=s) or (Wp^.Value.GetSStation.GetName=s)) then CheckWay:=true;
+      WayHead:=WayHead^.next;
+    end;
+  end
+  else
+  begin
+    while WayHead<>nil do
+    begin
+      WP:=WayHead;
+      if ((Wp^.Value.GetFStation.GetName=s) and (Wp^.Value.GetSStation.GetName=s1)) or ((Wp^.Value.GetFStation.GetName=s1) and (Wp^.Value.GetSStation.GetName=s)) then CheckWay:=true;
+      WayHead:=WayHead^.next;
+    end;
+  end;
+   WayHead:=standart;
+end;
 
 Procedure TForm1.AddWayList(v:TWay);
 begin

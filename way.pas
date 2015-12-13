@@ -9,8 +9,8 @@ type
       Station1:TStation;
       Station2:TStation;
       Time:integer;
-      Transition:boolean; // true - путь, false - переход.
-      isVisited:boolean;  // При поиске пути.True - посещена.
+      Transition:boolean;   // true - путь, false - переход.
+      isVisited:boolean;    // При поиске пути.True - посещена.
     public
       Procedure SetTime(i:integer);
       Function GetTime:integer;
